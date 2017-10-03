@@ -107,9 +107,20 @@ function printRowLine () {
 }
 
 function printColHeads () {
-  let heads = '  '
+  let heads = ''
+  if (cols < 10) {
+    heads = '  '
+  } else {
+    heads = '   '
+  }
+
   for (let c = 1; c <= cols; c++) {
-    heads += ' ' + c + '  '
+    if (c < 10) {
+      heads += ' ' + c + '  '
+    } else {
+      heads += ' ' + c + ' '
+    }
+
   }
   console.log(heads)
 }
