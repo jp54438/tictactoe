@@ -76,8 +76,17 @@ function setupBoard () {
 function printRowLine () {
   let line = '  '
   for (let c = 1; c <= cols; c++) {
-    line += '--- '
+    if (rows < 10) {
+      line += ' --- '
+    } else {
+      if (c === 0) {
+        line += '  ---'
+      } else {
+        line += ' ---'
+      }
+    }
   }
+
   console.log(line)
 }
 
@@ -93,11 +102,19 @@ function printBoard () {
   console.log('tulosta taulukko: for-silmukka')
   printColHeads()
   printRowLine()
-  let output = '1 |'
+  let output = ''
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
       if (j === 0) {
-        output = (i + 1) + '|'
+        if (rows < 10) {
+          output = (i + 1) + '|'
+        } else {
+          if (i < 9) {
+            output = (i + 1) + ' |'
+          } else {
+            output = (i + 1) + '|'
+          }
+        }
       }
       output += gameBoard[i][j] + '|'
     }
@@ -133,8 +150,8 @@ function playGame () {
 }
 
 function askPosition () {
-  nextPosition[0] = parseInt(ask('position', players[turn] + ': give column number [0 - ' + cols + ']', '', '', '', '^[0-9]{1}$'))
-  nextPosition[1] = parseInt(ask('position', players[turn] + ': give row number [0 - ' + rows + ']', '', '', '', '^[0-9]{1}$'))
+  nextPosition[0] = parseInt(ask('position', players[turn] + ': give column number [0 - ' + cols + ']', '', '', '', '^[0-9]*$'))
+  nextPosition[1] = parseInt(ask('position', players[turn] + ': give row number [0 - ' + rows + ']', '', '', '', '^[0-9]*$'))
 }
 function updateBoard () {
   if (turn === 0) {
