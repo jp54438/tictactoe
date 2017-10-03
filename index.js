@@ -8,9 +8,12 @@ var players = [2]
 var nbrPlayers = 1
 var turn = 1
 var turnCount = 0
-var mark = ' X '
+var mark = [' X ', ' O ']
 var gameOver = false
 var nextPosition = []
+
+var time = 0
+var start
 
 function main () {
   setupGame()
@@ -48,7 +51,7 @@ function ask (type, question, errormsg1, errormsg2, errormsg3, reg) {
           success = !success
         }
       // checking that winning line length is correct
-      } else if (type === lineLength) {
+      } else if (type === 'lineLength') {
         if (!success || (value < 3)) {
           console.log(errormsg2)
           success = !success
@@ -120,13 +123,11 @@ function printColHeads () {
     } else {
       heads += ' ' + c + ' '
     }
-
   }
   console.log(heads)
 }
 
 function printBoard () {
-  console.log('tulosta taulukko: for-silmukka')
   printColHeads()
   printRowLine()
   let output = ''
@@ -163,7 +164,11 @@ function playGame () {
   printBoard()
 
   while (!gameOver) {
-    turnCount++
+    if (nbrPlayers === 1) {
+      time = 0
+      start = new Date().getTime()     
+    }
+    
     askPosition()
     updateBoard(turn, nextPosition)
     gameOver = checkWin()
@@ -177,39 +182,37 @@ function playGame () {
       }
     }
   }
-  console.log(players[turn] + 'wins!')
+  console.log('******* WINNER: ' + players[turn] + '! ***********' )
+  if (nbrPlayers === 1) {
+    let elapsed = (new Date().getTime() - start - time) / 100
+    console.log('Time: ' + elapsed)
+  }
 }
 
 function askPosition () {
-  nextPosition[0] = parseInt(ask('position_r', players[turn] + ': give column number [1 - ' + cols + ']', 'give column number [1 - ' + cols + ']', 'Row number cannot be bigger than ' + cols, '', '^[0-9]+$'))
-  nextPosition[1] = parseInt(ask('position_c', players[turn] + ': give row number [1 - ' + rows + ']', 'give number [1 - ' + cols + ']', 'Column number cannot be bigger than ' + cols, '', '^[0-9]+$'))
+  nextPosition[0] = parseInt(ask('position_r', players[turn] + '(' + mark[turn] + ')' + ': give column number [1 - ' + cols + ']', 'give column number [1 - ' + cols + ']', 'Row number cannot be bigger than ' + cols, '', '^[0-9]+$'))
+  nextPosition[1] = parseInt(ask('position_c', players[turn] + '(' + mark[turn] + ')' + ': give row number [1 - ' + rows + ']', 'give number [1 - ' + cols + ']', 'Column number cannot be bigger than ' + cols, '', '^[0-9]+$'))
 }
 function updateBoard () {
-  if (turn === 0) {
-    mark = ' X '
-  } else {
-    mark = ' 0 '
-  }
-  gameBoard[nextPosition[1] - 1][nextPosition[0] - 1] = mark
+  gameBoard[nextPosition[1] - 1][nextPosition[0] - 1] = mark[turn]
 
   // OR: let rowToUpdate = gameBoard[nextPosition[1] - 1]
-  // rowToUpdate[nextPosition[0] - 1] = mark
+  // rowToUpdate[nextPosition[0] - 1] = mark[turn]
 }
 
 function checkWin () {
   let foundLength = 0
-  console.log(mark)
   // check only the player who set the last item
   // try to find items on the rigjt side, then below and last diagonally
   for (let i = 0; i < rows; i++) {
     // console.log('i: '+i)
     for (let j = 0; j < cols; j++) {
       // console.log('j: '+j)
-      if (gameBoard[i][j] === mark) {
+      if (gameBoard[i][j] === mark[turn]) {
         foundLength = 1
         // finding items on the right
         for (let w = j + 1; w < cols; w++) {
-          if (gameBoard[i][w] === mark) {
+          if (gameBoard[i][w] === mark[turn]) {
             foundLength++
             if (foundLength >= lineLength) {
               return true
@@ -221,7 +224,7 @@ function checkWin () {
         }
         // finding items below
         for (let b = i + 1; b < rows; b++) {
-          if (gameBoard[b][j] === mark) {
+          if (gameBoard[b][j] === mark[turn]) {
             foundLength++
             if (foundLength >= lineLength) {
               return true
@@ -234,10 +237,8 @@ function checkWin () {
         // finding item diagonally left below
         let dly = j - 1
         for (let dlx = i + 1; dlx < rows && dly > 0; dlx++) {
-          if (gameBoard[dlx][dly] === mark) {
+          if (gameBoard[dlx][dly] === mark[turn]) {
             foundLength++
-            console.log('dlx: ' + dlx)
-            console.log('dlx: ' + dly)
             if (foundLength >= lineLength) {
               return true
             }
@@ -249,17 +250,11 @@ function checkWin () {
           }
         }
 
-
         // finding item diagonally right below
         let dry = j + 1
         for (let drx = i + 1; drx < rows && dry < cols; drx++) {
-          console.log('drx: ' + drx)
-          console.log('dry: ' + dry)
-          if (gameBoard[drx][dry] === mark) {
+          if (gameBoard[drx][dry] === mark[turn]) {
             foundLength++
-            console.log('drx löytyi: ' + drx)
-            console.log('dry löytyi: ' + dry)
-            console.log('foundLength: '+foundLength)
             if (foundLength >= lineLength) {
               return true
             }
