@@ -162,13 +162,15 @@ function playGame () {
     console.log(players[1] + ' starts')
   }
   printBoard()
+  let timerStarted = false
 
   while (!gameOver) {
-    if (nbrPlayers === 1) {
+    // start timer if 1-player game
+    if (nbrPlayers === 1 && !timerStarted) {
       time = 0
-      start = new Date().getTime()     
+      start = new Date().getTime()
+      timerStarted = true
     }
-    
     askPosition()
     updateBoard(turn, nextPosition)
     gameOver = checkWin()
@@ -183,15 +185,19 @@ function playGame () {
     }
   }
   console.log('******* WINNER: ' + players[turn] + '! ***********' )
+  // print elapsed time if 1-player game
   if (nbrPlayers === 1) {
-    let elapsed = (new Date().getTime() - start - time) / 100
-    console.log('Time: ' + elapsed)
+    let now = new Date().getTime()
+    let elapsed = Math.floor((now - start) / 1000)
+    let seconds = elapsed % 60
+    console.log('Time: ' + Math.floor(elapsed / 60) + ' minutes ' + seconds + ' seconds')
+    timerStarted = false
   }
 }
 
 function askPosition () {
   nextPosition[0] = parseInt(ask('position_r', players[turn] + '(' + mark[turn] + ')' + ': give column number [1 - ' + cols + ']', 'give column number [1 - ' + cols + ']', 'Row number cannot be bigger than ' + cols, '', '^[0-9]+$'))
-  nextPosition[1] = parseInt(ask('position_c', players[turn] + '(' + mark[turn] + ')' + ': give row number [1 - ' + rows + ']', 'give number [1 - ' + cols + ']', 'Column number cannot be bigger than ' + cols, '', '^[0-9]+$'))
+  nextPosition[1] = parseInt(ask('position_c', players[turn] + '(' + mark[turn] + ')' + ': give row number [1 - ' + rows + ']', 'give number [1 - ' + rows + ']', 'Column number cannot be bigger than ' + cols, '', '^[0-9]+$'))
 }
 function updateBoard () {
   gameBoard[nextPosition[1] - 1][nextPosition[0] - 1] = mark[turn]
@@ -236,7 +242,7 @@ function checkWin () {
         }
         // finding item diagonally left below
         let dly = j - 1
-        for (let dlx = i + 1; dlx < rows && dly > 0; dlx++) {
+        for (let dlx = i + 1; dlx < rows && dly >= 0; dlx++) {
           if (gameBoard[dlx][dly] === mark[turn]) {
             foundLength++
             if (foundLength >= lineLength) {
