@@ -15,6 +15,9 @@ var computer = false
 const STR_COMPUTER = 'computer'
 const STR_EMPTY = '   '
 
+/**
+ * Called when game is started. Handles the the game lifecycle.
+ */
 function main () {
   setupGame()
   setupBoard()
@@ -23,6 +26,9 @@ function main () {
   }
 }
 
+/**
+ *  Makes needed setup for the build up game board. Asks the settings from the user  
+ */
 function setupGame () {
   rows = parseInt(askSettings('row', 'Give number of game board rows [3 or more]', 'Amount of rows must be at least 3"', '', '', '^[0-9]{1,}$'))
   console.log(rows)
@@ -39,6 +45,16 @@ function setupGame () {
   }
 }
 
+// TODO: add player input validation, and align other error messages + update JSDoc
+/**
+ * Helper function for setting values. Validates the data using RegEx and game board limitations
+ * @param {String} type Setting type which is requested 
+ * @param {Strig} question, which is asked from the user in command prompt  
+ * @param {String} errormsg1, error message which is shown for the user if input value is too small 
+ * @param {String} errormsg2, error message which is shown for the user if ijnput value is too big 
+ * @param {*} errormsg3 
+ * @param {*} reg 
+ */
 function askSettings (type, question, errormsg1, errormsg2, errormsg3, reg) {
   let regex = new RegExp(reg)
   let value = ''
@@ -71,6 +87,9 @@ function askSettings (type, question, errormsg1, errormsg2, errormsg3, reg) {
   return value
 }
 
+/**
+ * Helper function to request user next move. Validates the input agaainst game rules and limitations. updates the nextPosition array.
+ */
 function askPosition () {
   let question = players[turn] + ' (' + mark[turn] + ')' + ': give next position [column number (1 - ' + cols + ')  row number (1 - ' + rows + ')], for example: 2 3)'
   let regex = new RegExp('^[0-9]+ [0-9]+$')
@@ -86,8 +105,6 @@ function askPosition () {
     } else {
       col = value.split(' ')[0]
       row = value.split(' ')[1]
-      console.log('col: '+col)
-      console.log('row: '+row)
       if (col <= 0 || row <= 0) {
         console.log('Value must be bigger than 0')
         success = !success
@@ -107,18 +124,12 @@ function askPosition () {
   nextPosition[0] = col
   nextPosition[1] = row
 }
-/* 
-function makeSelection () {
-  let success = false
-  do {
-    nextPosition[0] = Math.floor(Math.random() * cols) + 1
-    nextPosition[1] = Math.floor(Math.random() * rows) + 1
-    success = isFreePosition(gameBoard, nextPosition)
-  } while (!success)
-  console.log('Computer selected: ' + nextPosition[0] + ' ' + nextPosition[1])
-}
-*/
-
+/**
+ * Helper function for getting user input in game menu situations. 
+ * @param {String} question to be asked from the user
+ * @param {String} errormsg, error message which is shown for the user if input value is incorrect 
+ * @param {String} reg, RegEx string for validating user input 
+ */
 function ask (question, errormsg, reg) {
   let regex = new RegExp(reg)
   let value = ''
@@ -134,6 +145,9 @@ function ask (question, errormsg, reg) {
   return value
 }
 
+/**
+ * Initializes game board array based on game settings. Fills the array cells with empty characters.
+ */
 function setupBoard () {
   gameBoard.length = 0
   for (let i = 0; i < rows; i++) {
@@ -143,11 +157,11 @@ function setupBoard () {
     }
     gameBoard.push(data)
   }
-
-
-
 }
 
+/**
+ * Print out separator line for the game board rows
+ */
 function printRowLine () {
   let line = '  '
   for (let c = 1; c <= cols; c++) {
@@ -165,6 +179,9 @@ function printRowLine () {
   console.log(line)
 }
 
+/**
+ * Print out column head numbers
+ */
 function printColHeads () {
   let heads = ''
   if (cols < 10) {
@@ -183,6 +200,9 @@ function printColHeads () {
   console.log(heads)
 }
 
+/**
+ * Print out game board with current game situation
+ */
 function printBoard () {
   printColHeads()
   printRowLine()
@@ -207,6 +227,9 @@ function printBoard () {
   }
 }
 
+/**
+ * Main Game play function.  
+ */
 function playGame () {
   console.log('######### Game Begins #########')
   // Arvotaan aloittaja
@@ -265,6 +288,9 @@ function playGame () {
   }
 }
 
+/**
+ * Makes random selection for the next move
+ */
 function makeSelection () {
   let success = false
   do {
@@ -275,6 +301,13 @@ function makeSelection () {
   console.log('Computer (' + mark[turn] + ') selected: ' + nextPosition[0] + ' ' + nextPosition[1])
 }
 
+/**
+ * Checks if the @board array includes other than @STR_EMPTY character in given postion. 
+ * @return true if @STR_EMPTY is not fund from the given position, otherwise returns false.
+ * 
+ * @param {Array} board, 2D array 
+ * @param {Array} position, Array containing x and y coordinates of the position from where the to check whether it is free or not. 
+ */
 function isFreePosition (board, position) {
   if (board[position[1] - 1][position[0] - 1] === STR_EMPTY) {
     return true
@@ -282,6 +315,10 @@ function isFreePosition (board, position) {
     return false
   }
 }
+
+/**
+ * Checks if there are free cells in the gameboard. Returns true if there is at least one free cell.
+ */
 function freeCellsInBoard () {
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
@@ -292,6 +329,10 @@ function freeCellsInBoard () {
   }
   return false
 }
+
+/**
+ * Upadtes the game board with the current nextPosition value and sets player mark of the current turn.
+ */
 function updateBoard () {
   gameBoard[nextPosition[1] - 1][nextPosition[0] - 1] = mark[turn]
 
@@ -299,14 +340,16 @@ function updateBoard () {
   // rowToUpdate[nextPosition[0] - 1] = mark[turn]
 }
 
+/**
+ * Checks if the player in turn has won the game. Finds the needed line lentgh horizontally, vertically and diagonically.
+ * @return true if the needed line lentgh found, otherwise returns false.
+ */
 function checkWin () {
   let foundLength = 0
   // check only the player who set the last item
   // try to find items on the rigjt side, then below and last diagonally
   for (let i = 0; i < rows; i++) {
-    // console.log('i: '+i)
     for (let j = 0; j < cols; j++) {
-      // console.log('j: '+j)
       if (gameBoard[i][j] === mark[turn]) {
         foundLength = 1
         // finding items on the right
@@ -336,7 +379,6 @@ function checkWin () {
         // finding item diagonally left below
         let dly = j - 1
         for (let dlx = i + 1; dlx < rows && dly >= 0; dlx++) {
-          console.log('dly: '+dly)
           if (gameBoard[dlx][dly] === mark[turn]) {
             foundLength++
             if (foundLength >= lineLength) {
@@ -370,4 +412,7 @@ function checkWin () {
   return false
 }
 
+/**
+ * Starts the game by calling Main function
+ */
 main()
