@@ -7,10 +7,13 @@ var gameBoard = []
 var players = [2]
 var nbrPlayers = 1
 var turn = 1
-var mark = [' X ', ' O ']
+const mark = [' X ', ' O ']
 var gameOver = false
 var nextPosition = []
 var startTime
+var computer = false
+const STR_COMPUTER = 'computer'
+const STR_EMPTY = '   '
 
 function main () {
   setupGame()
@@ -26,7 +29,10 @@ function setupGame () {
   players[0] = askSettings('player1', 'Name of the Player 1 [min. 2 chars]', 'Name must contain alphabets only', '', '', '^[A-z]{2,}$')
   if (nbrPlayers === 2) {
     players[1] = askSettings('player2', 'Name of the Player 2 [min. 2 chars]', 'Name must contain alphabets only', '', '', '^[A-z]{2,}$')
-  } else players[1] = 'computer'
+  } else {
+    players[1] = STR_COMPUTER
+    computer = true
+  }
   setupBoard()
   playGame()
 }
@@ -42,7 +48,7 @@ function askSettings (type, question, errormsg1, errormsg2, errormsg3, reg) {
       console.log('incorrect input')
     } else {
       // Checking that amount of rows and cols are correct
-      if (type === 'row' || type === cols) {
+      if (type === 'row' || type === 'col') {
         if (!success || value < 3) {
           console.log(errormsg1)
           success = !success
@@ -54,22 +60,6 @@ function askSettings (type, question, errormsg1, errormsg2, errormsg3, reg) {
           success = !success
         } else if (!success || (value > rows || value > cols)) {
           console.log(errormsg3)
-          success = !success
-        }
-      } else if (type === 'position_r') {
-        if (value <= 0) {
-          console.log(errormsg1)
-          success = !success
-        } else if (value > rows) {
-          console.log(errormsg2)
-          success = !success
-        }
-      } else if (type === 'position_c') {
-        if (value <= 0) {
-          console.log(errormsg1)
-          success = !success
-        } else if (value > cols) {
-          console.log(errormsg2)
           success = !success
         }
       }
@@ -103,6 +93,9 @@ function askPosition () {
       } else if (row > rows) {
         console.log('Row value cannot be bigger than amount of rows' )
         success = !success
+      } else if (!isFreePosition(gameBoard, [row, col])) {
+        console.log('Position already played')
+        success = !success
       }
     }
   } while (!success)
@@ -115,7 +108,7 @@ function setupBoard () {
   for (let i = 0; i < rows; i++) {
     let data = []
     for (let j = 0; j < cols; j++) {
-      data.push('   ')
+      data.push(STR_EMPTY)
     }
     gameBoard.push(data)
   }
@@ -194,7 +187,11 @@ function playGame () {
       startTime = new Date().getTime()
       timerStarted = true
     }
-    askPosition()
+    if (computer && players[turn] === STR_COMPUTER) {
+      makeSelection()
+    } else {
+      askPosition()
+    }
     updateBoard(turn, nextPosition)
     gameOver = checkWin()
     printBoard()
@@ -217,6 +214,23 @@ function playGame () {
   }
 }
 
+function makeSelection () {
+  let success = false
+  do {
+    nextPosition[0] = Math.floor(Math.random() * cols) + 1
+    nextPosition[1] = Math.floor(Math.random() * rows) + 1
+    success = isFreePosition(gameBoard, nextPosition)
+  } while (!success)
+  console.log('Computer selected: ' + nextPosition[0] + ' ' + nextPosition[1])
+}
+
+function isFreePosition (board, position) {
+  if (board[position[1] - 1][position[0] - 1] === STR_EMPTY) {
+    return true
+  } else {
+    return false
+  }
+}
 function updateBoard () {
   gameBoard[nextPosition[1] - 1][nextPosition[0] - 1] = mark[turn]
 
