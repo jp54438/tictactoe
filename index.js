@@ -7,37 +7,34 @@ var gameBoard = []
 var players = [2]
 var nbrPlayers = 1
 var turn = 1
-var turnCount = 0
 var mark = [' X ', ' O ']
 var gameOver = false
 var nextPosition = []
-
-var time = 0
-var start
+var startTime
 
 function main () {
   setupGame()
 }
 
 function setupGame () {
-  rows = parseInt(ask('row', 'Give number of game board rows [3 or more]', 'Amount of rows must be at least 3"', '', '', '^[0-9]{1,}$'))
+  rows = parseInt(askSettings('row', 'Give number of game board rows [3 or more]', 'Amount of rows must be at least 3"', '', '', '^[0-9]{1,}$'))
   console.log(rows)
-  cols = parseInt(ask('col', 'Give number of game board columns  [3 or more]', 'Amount of columns must be at least 3"', '', '', '^[0-9]{1,}$'))
+  cols = parseInt(askSettings('col', 'Give number of game board columns  [3 or more]', 'Amount of columns must be at least 3"', '', '', '^[0-9]{1,}$'))
   console.log(cols)
-  lineLength = parseInt(ask('lineLength', 'Give number of items need to win the game [3 or more]', 'Winning line length must be at least 3"', 'Winning line length cannot be shorter than 3', 'Winning line cannot be longer than rows or columns.', '^[0-9]{1,}$'))
-  nbrPlayers = parseInt(ask('nbrPlayers', 'How many players [1 or 2]?', 'Select 1 or 2', '', '', '^[1-2]{1}$'))
-  players[0] = ask('player1', 'Name of the Player 1', 'Name must contain alphabets only', '', '', '^[A-z]{2,}$')
+  lineLength = parseInt(askSettings('lineLength', 'Give number of items need to win the game [3 or more]', 'Winning line length must be at least 3"', 'Winning line length cannot be shorter than 3', 'Winning line cannot be longer than rows or columns.', '^[0-9]{1,}$'))
+  nbrPlayers = parseInt(askSettings('nbrPlayers', 'How many players [1 or 2]?', 'Select 1 or 2', '', '', '^[1-2]{1}$'))
+  players[0] = askSettings('player1', 'Name of the Player 1 [min. 2 chars]', 'Name must contain alphabets only', '', '', '^[A-z]{2,}$')
   if (nbrPlayers === 2) {
-    players[1] = ask('player2', 'Name of the Player 2', 'Name must contain alphabets only', '', '', '^[A-z]{2,}$')
+    players[1] = askSettings('player2', 'Name of the Player 2 [min. 2 chars]', 'Name must contain alphabets only', '', '', '^[A-z]{2,}$')
   } else players[1] = 'computer'
   setupBoard()
   playGame()
 }
 
-function ask (type, question, errormsg1, errormsg2, errormsg3, reg) {
-  var regex = new RegExp(reg)
-  var value = ''
-  var success = false
+function askSettings (type, question, errormsg1, errormsg2, errormsg3, reg) {
+  let regex = new RegExp(reg)
+  let value = ''
+  let success = false
   do {
     value = readlineSync.question(question + ': ')
     success = regex.test(value)
@@ -80,6 +77,38 @@ function ask (type, question, errormsg1, errormsg2, errormsg3, reg) {
   } while (!success)
 
   return value
+}
+
+function askPosition () {
+  let question = players[turn] + ' (' + mark[turn] + ')' + ': give next position [column number (1 - ' + cols + ')  row number (1 - ' + rows + ')], for example: 2 3)'
+  let regex = new RegExp('^[0-9]+ [0-9]+$')
+  let value = ''
+  let success = false
+  let col
+  let row
+  do {
+    value = readlineSync.question(question + ': ')
+    success = regex.test(value)
+    if (!success) {
+      console.log('incorrect input')
+    } else {
+      col = value.split(' ')[0]
+      row = value.split(' ')[1]
+      if (col <= 0 || row <= 0) {
+        console.log('Value must be bigger than 0')
+        success = !success
+      } else if (col > cols) {
+        console.log('Column value cannot be bigger than amount of columns' )
+        success = !success
+      } else if (row > rows) {
+        console.log('Row value cannot be bigger than amount of rows' )
+        success = !success
+      }
+    }
+  } while (!success)
+
+  nextPosition[0] = col
+  nextPosition[1] = row
 }
 
 function setupBoard () {
@@ -155,20 +184,14 @@ function playGame () {
   console.log('######### Game Begins #########')
   // Arvotaan aloittaja
   turn = Math.floor(Math.random() * 2)
-  console.log(turn)
-  if (turn === 0) {
-    console.log(players[0] + ' starts')
-  } else { // if (turn === 1)
-    console.log(players[1] + ' starts')
-  }
+  console.log(players[turn] + ' starts')
   printBoard()
   let timerStarted = false
 
   while (!gameOver) {
     // start timer if 1-player game
     if (nbrPlayers === 1 && !timerStarted) {
-      time = 0
-      start = new Date().getTime()
+      startTime = new Date().getTime()
       timerStarted = true
     }
     askPosition()
@@ -187,18 +210,13 @@ function playGame () {
   console.log('******* WINNER: ' + players[turn] + '! ***********' )
   // print elapsed time if 1-player game
   if (nbrPlayers === 1) {
-    let now = new Date().getTime()
-    let elapsed = Math.floor((now - start) / 1000)
+    let elapsed = Math.floor((new Date().getTime() - startTime) / 1000)
     let seconds = elapsed % 60
     console.log('Time: ' + Math.floor(elapsed / 60) + ' minutes ' + seconds + ' seconds')
     timerStarted = false
   }
 }
 
-function askPosition () {
-  nextPosition[0] = parseInt(ask('position_r', players[turn] + '(' + mark[turn] + ')' + ': give column number [1 - ' + cols + ']', 'give column number [1 - ' + cols + ']', 'Row number cannot be bigger than ' + cols, '', '^[0-9]+$'))
-  nextPosition[1] = parseInt(ask('position_c', players[turn] + '(' + mark[turn] + ')' + ': give row number [1 - ' + rows + ']', 'give number [1 - ' + rows + ']', 'Column number cannot be bigger than ' + cols, '', '^[0-9]+$'))
-}
 function updateBoard () {
   gameBoard[nextPosition[1] - 1][nextPosition[0] - 1] = mark[turn]
 
