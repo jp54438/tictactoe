@@ -28,7 +28,7 @@ function showHighScore () {
 function mainMenu () {
   let quit = false
   do {
-    let value = ask('Select: Start New Game [S], High Score [H], Quit [Q]', '', '^[S]|[s]|[H]|[h]|[Q]|[q]{1}$')
+    let value = ask('Select:\n [S] Start New Game \n [H] High Score\n [Q] Quit', '', '^[S]|[s]|[H]|[h]|[Q]|[q]{1}$')
     if (value === 'S' || value === 's') {
       setupGame()
       setupBoard()
