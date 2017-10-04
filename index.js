@@ -86,6 +86,8 @@ function askPosition () {
     } else {
       col = value.split(' ')[0]
       row = value.split(' ')[1]
+      console.log('col: '+col)
+      console.log('row: '+row)
       if (col <= 0 || row <= 0) {
         console.log('Value must be bigger than 0')
         success = !success
@@ -141,6 +143,9 @@ function setupBoard () {
     }
     gameBoard.push(data)
   }
+
+
+
 }
 
 function printRowLine () {
@@ -209,7 +214,7 @@ function playGame () {
   console.log(players[turn] + ' starts')
   printBoard()
   let timerStarted = false
-  let isDraw = false 
+  let isDraw = false
 
   while (!gameOver) {
     // start timer if 1-player game
@@ -223,6 +228,7 @@ function playGame () {
       askPosition()
     }
     updateBoard(turn, nextPosition)
+
     gameOver = checkWin()
     isDraw = !freeCellsInBoard()
     if (isDraw) {
@@ -266,7 +272,7 @@ function makeSelection () {
     nextPosition[1] = Math.floor(Math.random() * rows) + 1
     success = isFreePosition(gameBoard, nextPosition)
   } while (!success)
-  console.log('Computer selected: ' + nextPosition[0] + ' ' + nextPosition[1])
+  console.log('Computer (' + mark[turn] + ') selected: ' + nextPosition[0] + ' ' + nextPosition[1])
 }
 
 function isFreePosition (board, position) {
@@ -279,7 +285,6 @@ function isFreePosition (board, position) {
 function freeCellsInBoard () {
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
-      console.log('solu: ' + gameBoard[i][j])
       if (gameBoard[i][j] === STR_EMPTY) {
         return true
       }
@@ -313,9 +318,9 @@ function checkWin () {
             }
           } else {
             w = cols
-            foundLength = 1
           }
         }
+        foundLength = 1
         // finding items below
         for (let b = i + 1; b < rows; b++) {
           if (gameBoard[b][j] === mark[turn]) {
@@ -325,25 +330,25 @@ function checkWin () {
             }
           } else {
             b = rows
-            foundLength = 1
           }
         }
+        foundLength = 1
         // finding item diagonally left below
         let dly = j - 1
         for (let dlx = i + 1; dlx < rows && dly >= 0; dlx++) {
+          console.log('dly: '+dly)
           if (gameBoard[dlx][dly] === mark[turn]) {
             foundLength++
             if (foundLength >= lineLength) {
               return true
             }
-            dly--
           } else {
             dlx = rows
-            dly = 0
-            foundLength = 1
+            dly = -1
           }
+          dly--
         }
-
+        foundLength = 1
         // finding item diagonally right below
         let dry = j + 1
         for (let drx = i + 1; drx < rows && dry < cols; drx++) {
@@ -356,9 +361,9 @@ function checkWin () {
           } else {
             drx = rows
             dry = cols
-            foundLength = 1
           }
         }
+        foundLength = 1
       }
     }
   }
