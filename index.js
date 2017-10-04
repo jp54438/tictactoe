@@ -19,26 +19,43 @@ const STR_EMPTY = '   '
  * Called when game is started. Handles the the game lifecycle.
  */
 function main () {
-  setupGame()
-  setupBoard()
-  while (playGame()) {
+  mainMenu()
+}
 
-  }
+function showHighScore () {
+  console.log('High Score')
+}
+function mainMenu () {
+  let quit = false
+  do {
+    let value = ask('Select: Start New Game [S], High Score [H], Quit [Q]', '', '^[S]|[s]|[H]|[h]|[Q]|[q]{1}$')
+    if (value === 'S' || value === 's') {
+      setupGame()
+      setupBoard()
+      while (playGame()) {      
+      }
+    } else if (value === 'H' || value === 'h') {
+      showHighScore()
+    } else if (value === 'Q' || value === 'q') {
+      quit = true
+      console.log('Good bye!')
+    }
+  } while (!quit)
 }
 
 /**
  *  Makes needed setup for the build up game board. Asks the settings from the user  
  */
 function setupGame () {
-  rows = parseInt(askSettings('row', 'Give number of game board rows [3 or more]', 'Amount of rows must be at least 3"', '', '', '^[0-9]{1,}$'))
+  rows = parseInt(askSettings('row', 'Give number of game board rows [3 or more]', '', 'Amount of rows must be at least 3', '', '^[0-9]{1,}$'))
   console.log(rows)
-  cols = parseInt(askSettings('col', 'Give number of game board columns  [3 or more]', 'Amount of columns must be at least 3"', '', '', '^[0-9]{1,}$'))
+  cols = parseInt(askSettings('col', 'Give number of game board columns  [3 or more]', '', 'Amount of columns must be at least 3', '', '^[0-9]{1,}$'))
   console.log(cols)
-  lineLength = parseInt(askSettings('lineLength', 'Give number of items need to win the game [3 or more]', 'Winning line length must be at least 3"', 'Winning line length cannot be shorter than 3', 'Winning line cannot be longer than rows or columns.', '^[0-9]{1,}$'))
+  lineLength = parseInt(askSettings('lineLength', 'Give number of items need to win the game [3 or more]', '', 'Winning line length cannot be shorter than 3', 'Winning line cannot be longer than rows or columns.', '^[0-9]{1,}$'))
   nbrPlayers = parseInt(askSettings('nbrPlayers', 'How many players [1 or 2]?', 'Select 1 or 2', '', '', '^[1-2]{1}$'))
-  players[0] = askSettings('player1', 'Name of the Player 1 [min. 2 chars]', 'Name must contain alphabets only', '', '', '^[A-z]{2,}$')
+  players[0] = askSettings('player1', 'Name of the Player 1 [alphabets only]', 'Name must contain alphabets only', '', '', '^[A-z]{1,}$')
   if (nbrPlayers === 2) {
-    players[1] = askSettings('player2', 'Name of the Player 2 [min. 2 chars]', 'Name must contain alphabets only', '', '', '^[A-z]{2,}$')
+    players[1] = askSettings('player2', 'Name of the Player 2 [alphabets only]', 'Name must contain alphabets only', '', '', '^[A-z]{1,}$')
   } else {
     players[1] = STR_COMPUTER
     computer = true
@@ -47,13 +64,15 @@ function setupGame () {
 
 // TODO: add player input validation, and align other error messages + update JSDoc
 /**
- * Helper function for setting values. Validates the data using RegEx and game board limitations
+ * Helper function for setting values. Validates the data using RegEx and game board limitations. 
  * @param {String} type Setting type which is requested 
- * @param {Strig} question, which is asked from the user in command prompt  
- * @param {String} errormsg1, error message which is shown for the user if input value is too small 
- * @param {String} errormsg2, error message which is shown for the user if ijnput value is too big 
- * @param {*} errormsg3 
- * @param {*} reg 
+ * @param {Strig} question, which is asked from the user in command prompt. Default value: 'incorrect input'  
+ * @param {String} errormsg1, error message which is shown for the user if input is incorrect format. Default value: 'incorrect input' 
+ * @param {String} errormsg2, error message which is shown for the user if ijnput value is too small. Default value: 'incorrect input'
+ * @param {*} errormsg3, error message which is shown for the user if ijnput value is too big. Default value: 'incorrect input'
+ * @param {*} reg, RegEx string for validating user input
+ * 
+ * @return user input as string
  */
 function askSettings (type, question, errormsg1, errormsg2, errormsg3, reg) {
   let regex = new RegExp(reg)
@@ -63,22 +82,38 @@ function askSettings (type, question, errormsg1, errormsg2, errormsg3, reg) {
     value = readlineSync.question(question + ': ')
     success = regex.test(value)
     if (!success) {
-      console.log('incorrect input')
+      if (errormsg1.length === 0) {
+        console.log('incorrect input')
+      } else {
+        console.log(errormsg1)
+      }
     } else {
       // Checking that amount of rows and cols are correct
       if (type === 'row' || type === 'col') {
-        if (!success || value < 3) {
-          console.log(errormsg1)
-          success = !success
+        if (value < 3) {
+          if (errormsg2.length === 0) {
+            console.log('incorrect input')
+          } else {
+            console.log(errormsg2)
+          }
+          success = false
         }
       // checking that winning line length is correct
       } else if (type === 'lineLength') {
-        if (!success || (value < 3)) {
-          console.log(errormsg2)
-          success = !success
-        } else if (!success || (value > rows || value > cols)) {
-          console.log(errormsg3)
-          success = !success
+        if (value < 3) {
+          if (errormsg2.length === 0) {
+            console.log('incorrect input')
+          } else {
+            console.log(errormsg2)
+          }
+          success = false
+        } else if (value > rows || value > cols) {
+          if (errormsg3.length === 0) {
+            console.log('incorrect input')
+          } else {
+            console.log(errormsg3)
+          }
+          success = false
         }
       }
     }
@@ -279,7 +314,8 @@ function playGame () {
     console.log('Time: ' + Math.floor(elapsed / 60) + ' minutes ' + seconds + ' seconds')
     timerStarted = false
   }
-  if (ask('Play again? [Y / N]', 'Incorrect input, please select Y or N', '^[Y]|[N]{1}$') === 'Y') {
+  let newGame = ask('Play again? [Y / N]', 'Incorrect input, please select Y or N', '^[Y]|[y]|[N]|[n]{1}$')
+  if (newGame === 'Y' || newGame === 'y') {
     gameOver = false
     setupBoard()
     return true
