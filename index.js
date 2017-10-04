@@ -17,6 +17,10 @@ const STR_EMPTY = '   '
 
 function main () {
   setupGame()
+  setupBoard()
+  while (playGame()) {
+
+  }
 }
 
 function setupGame () {
@@ -33,8 +37,6 @@ function setupGame () {
     players[1] = STR_COMPUTER
     computer = true
   }
-  setupBoard()
-  playGame()
 }
 
 function askSettings (type, question, errormsg1, errormsg2, errormsg3, reg) {
@@ -93,7 +95,7 @@ function askPosition () {
       } else if (row > rows) {
         console.log('Row value cannot be bigger than amount of rows' )
         success = !success
-      } else if (!isFreePosition(gameBoard, [row, col])) {
+      } else if (!isFreePosition(gameBoard, [col, row])) {
         console.log('Position already played')
         success = !success
       }
@@ -103,8 +105,35 @@ function askPosition () {
   nextPosition[0] = col
   nextPosition[1] = row
 }
+/* 
+function makeSelection () {
+  let success = false
+  do {
+    nextPosition[0] = Math.floor(Math.random() * cols) + 1
+    nextPosition[1] = Math.floor(Math.random() * rows) + 1
+    success = isFreePosition(gameBoard, nextPosition)
+  } while (!success)
+  console.log('Computer selected: ' + nextPosition[0] + ' ' + nextPosition[1])
+}
+*/
+
+function ask (question, errormsg, reg) {
+  let regex = new RegExp(reg)
+  let value = ''
+  let success = false
+  do {
+    value = readlineSync.question(question + ': ')
+    success = regex.test(value)
+    if (!success) {
+      console.log(errormsg)
+    }
+  } while (!success)
+
+  return value
+}
 
 function setupBoard () {
+  gameBoard.length = 0
   for (let i = 0; i < rows; i++) {
     let data = []
     for (let j = 0; j < cols; j++) {
@@ -180,6 +209,7 @@ function playGame () {
   console.log(players[turn] + ' starts')
   printBoard()
   let timerStarted = false
+  let isDraw = false 
 
   while (!gameOver) {
     // start timer if 1-player game
@@ -194,6 +224,10 @@ function playGame () {
     }
     updateBoard(turn, nextPosition)
     gameOver = checkWin()
+    isDraw = !freeCellsInBoard()
+    if (isDraw) {
+      gameOver = true
+    }
     printBoard()
 
     if (!gameOver) {
@@ -204,13 +238,24 @@ function playGame () {
       }
     }
   }
-  console.log('******* WINNER: ' + players[turn] + '! ***********' )
+  if (!isDraw) {
+    console.log('******* WINNER: ' + players[turn] + '! ***********' )
   // print elapsed time if 1-player game
+  } else {
+    console.log('******* DRAW! ***********')
+  }
   if (nbrPlayers === 1) {
     let elapsed = Math.floor((new Date().getTime() - startTime) / 1000)
     let seconds = elapsed % 60
     console.log('Time: ' + Math.floor(elapsed / 60) + ' minutes ' + seconds + ' seconds')
     timerStarted = false
+  }
+  if (ask('Play again? [Y / N]', 'Incorrect input, please select Y or N', '^[Y]|[N]{1}$') === 'Y') {
+    gameOver = false
+    setupBoard()
+    return true
+  } else {
+    return false
   }
 }
 
@@ -230,6 +275,17 @@ function isFreePosition (board, position) {
   } else {
     return false
   }
+}
+function freeCellsInBoard () {
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      console.log('solu: ' + gameBoard[i][j])
+      if (gameBoard[i][j] === STR_EMPTY) {
+        return true
+      }
+    }
+  }
+  return false
 }
 function updateBoard () {
   gameBoard[nextPosition[1] - 1][nextPosition[0] - 1] = mark[turn]
