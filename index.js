@@ -51,11 +51,8 @@ function mainMenu () {
  */
 function setupGame () {
   rows = parseInt(askSettings('Give number of game board rows [3 or more]', '3', '', '', 'Amount of rows must be at least 3', '', '^[0-9]{1,}$'))
-  console.log(rows)
   cols = parseInt(askSettings('Give number of game board columns  [3 or more]', '3', '', '', 'Amount of columns must be at least 3', '', '^[0-9]{1,}$'))
-  console.log(cols)
   lineLength = parseInt(askSettings('Give number of items needed to win the game [3 or more]', '3', [cols.toString(), rows.toString()], '', 'Winning line length cannot be shorter than 3', 'Winning line cannot be longer than rows or columns', '^[0-9]{1,}$'))
-  //lineLength = parseInt(askSettings('Give number of items needed to win the game [3 or more]', '3', cols.toString(), '', 'Winning line length cannot be shorter than 3', '2-Winning line cannot be longer than rows or columns', '^[0-9]{1,}$'))
   nbrPlayers = parseInt(askSettings('How many players [1 or 2]?', '1', '2', 'Select 1 or 2', '', '', '^[1-2]{1}$'))
   players[0] = askSettings('Name of the Player 1 [alphabets only]', 'Name must contain alphabets only', '1', '', '', '', '^[A-z]{1,}$')
   if (nbrPlayers === 2) {
@@ -84,8 +81,6 @@ function askSettings (question, min, max, errormsg1, errormsg2, errormsg3, reg) 
   let regex = new RegExp(reg)
   let value = ''
   let success = false
-  // console.log(regex)
-  // console.log('3 on: ' + errormsg3)
   let msg1 = errormsg1
   let msg2 = errormsg2
   let msg3 = STR_INCORRECT
@@ -373,7 +368,6 @@ function playNext (posR, posC) {
   nextPosition[1] = posR
 }
 function randomNextPosition () {
-  console.log('random')
   let success = false
   do {
     nextPosition[0] = Math.floor(Math.random() * cols)
@@ -386,7 +380,6 @@ function playBasedOnPlayer (neededLength) {
   let startX = 0
   let startY = 0
   let playerMark
-  //let pos
 
   if (turn === 1) {
     playerMark = mark[0]
@@ -394,12 +387,7 @@ function playBasedOnPlayer (neededLength) {
     playerMark = mark[1]
   }
   let positions = checkLineLenght(neededLength, startX, startY, playerMark)
- // console.log('pos check on:' + pos)
-  //if (pos[0] === false) {
-    //return pos
-  //} else { // trying to find line with open empty end in the beginngn or in the end 
-  //let find = true
- // do {
+
   for (let pos in positions) {
     if (positions[pos][0] === true) {
       let beginning = isBeginningfree(positions[pos])
@@ -413,129 +401,87 @@ function playBasedOnPlayer (neededLength) {
       }
     }
   }
- /*   } else {
-      // set new finding position
-      if (startX < cols - 1) {
-        startX++
-      } else {
-        startX = 0
-        if (startY < rows - 1) {
-          startY++
-        }
-      }
-      if (startX >= cols - 1 && startY >= rows - 1) {
-        // Cannot find any more
-        console.log('cannot find')
-        find = false
-      }
-    }
-    /* if (find) {
-      pos = checkLineLenght(lineLength - 1, startX, startY, playerMark)
-      console.log('etsitään uudelleen')
-    } */
- // } while (find)
-  return [false, -1, -1, '']
-  
+
+  return [false, -1, -1, ''] 
 }
 
 function isBeginningfree (pos) {
-  console.log('pos on:' + pos)
   let positionToCheck = [0, 0]
   let retPos = pos
   if (pos[3] === 'r') {
     positionToCheck[0] = pos[2] - 1
     positionToCheck[1] = pos[1]
-    console.log('beg r posToCheck: ' + positionToCheck)
     if (isFreePosition(gameBoard, positionToCheck)) {
       retPos[2] = pos[2] - 1
       retPos[1] = pos[1]
-      console.log('beg r: ' + retPos)
       return retPos
     }
   } else if (pos[3] === 'b') {
     positionToCheck[0] = pos[2]
     positionToCheck[1] = pos[1] - 1
-    console.log('beg b posToCheck: ' + positionToCheck)
     if (isFreePosition(gameBoard, positionToCheck)) {
       retPos[2] = pos[2]
       retPos[1] = pos[1] - 1
-      console.log('beg b: ' + retPos)
       return retPos
     }
   } else if (pos[3] === 'dl') {
     positionToCheck[0] = pos[2] + 1
     positionToCheck[1] = pos[1] - 1
-    console.log('beg dl posToCheck: ' + positionToCheck)
     if (isFreePosition(gameBoard, positionToCheck)) {
       retPos[2] = pos[2] + 1
       retPos[1] = pos[1] - 1
-      console.log('beg dl: ' + retPos)
       return retPos
     }
   } else if (pos[3] === 'dr') {
     positionToCheck[0] = pos[2] - 1
     positionToCheck[1] = pos[1] - 1
-    console.log('beg dr posToCheck: ' + positionToCheck)
     if (isFreePosition(gameBoard, positionToCheck)) {
       retPos[2] = pos[2] - 1
       retPos[1] = pos[1] - 1
-      console.log('beg dr: ' + retPos)
       return retPos
     }
   }
-  console.log('beg end retPos:' + retPos)
   return [false, -1, -1, '']
 }
 
 function isEndFree (pos, lineL) {
-  console.log('pos on end:' + pos)
   let positionToCheck = [0, 0]
   let retPos = pos
   if (pos[3] === 'r') {
     positionToCheck[0] = pos[2] + lineL
     positionToCheck[1] = pos[1]
-    console.log('end r posToCheck: ' + positionToCheck)
     if (isFreePosition(gameBoard, positionToCheck)) {
       retPos[2] = pos[2] + lineL
       retPos[1] = pos[1]
-      console.log('END r: ' + retPos)
       return retPos
     }
   } else if (pos[3] === 'b') {
     positionToCheck[0] = pos[2]
     positionToCheck[1] = pos[1] + lineL
-    console.log('end b posToChe ck: ' + positionToCheck)
     if (isFreePosition(gameBoard, positionToCheck)) {
       retPos[2] = pos[2]
       retPos[1] = pos[1] + lineL
-      console.log('END b: ' + retPos)
       return retPos
     }
   } else if (pos[3] === 'dl') {
     positionToCheck[0] = pos[2] - lineL
     positionToCheck[1] = pos[1] + lineL
-    console.log('end dl posToCheck: ' + positionToCheck)
     if (isFreePosition(gameBoard, positionToCheck)) {
       retPos[2] = pos[2] - lineL
       retPos[1] = pos[1] + lineL
-      console.log('END dl: ' + retPos)
       return retPos
     }
   } else if (pos[3] === 'dr') {
-    console.log('arvo on :' + lineL)
     positionToCheck[0] = pos[2] + lineL
     positionToCheck[1] = pos[1] + lineL
-    console.log('end dr posToCheck: ' + positionToCheck)
     if (isFreePosition(gameBoard, positionToCheck)) {
       retPos[2] = pos[2] + lineL
       retPos[1] = pos[1] + lineL
-      console.log('END dr: ' + retPos)
       return retPos
     }
   }
 
   retPos = [false, -1, -1, '']
-  console.log('retPos: ' + retPos)
   return retPos
 }
 
@@ -547,7 +493,6 @@ function isEndFree (pos, lineL) {
  * @param {Array} position, Array containing x and y coordinates of the position from where the to check whether it is free or not. 
  */
 function isFreePosition (board, position) {
-  console.log('isFree: ' + position)
   if (position[0] < 0 || position[1] < 0 || position[0] > cols - 1 || position[1] > rows - 1) {
     return false
   }
@@ -597,10 +542,8 @@ function checkLineLenght (lineLen, startJ, startI, playMark) {
       if (gameBoard[i][j] === playMark) {
         foundLength = 1
         if (lineLen === 1) {
-          console.log('lineLen: ' + lineLen)
           returnArray.push([true, i, j, 'r'])
         } else {
-          console.log('lineLen: ' + lineLen)
           // finding items on the right
           for (let r = j + 1; r < cols; r++) {
             if (gameBoard[i][r] === playMark) {
@@ -662,7 +605,6 @@ function checkLineLenght (lineLen, startJ, startI, playMark) {
   if (returnArray.length === 0) {
     returnArray.push([false, -1, -1, ''])
   }
-  console.log(returnArray)
   return returnArray
 }
 
