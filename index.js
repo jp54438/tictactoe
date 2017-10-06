@@ -17,7 +17,7 @@ const STR_EMPTY = '   '
 const STR_INCORRECT = 'incorrect input'
 const INT_EASY = 0
 const INT_MEDIUM = 1
-const INT_HARD = 2 
+const INT_HARD = 2
 /**
  * Called when game is started. Handles the the game lifecycle.
  */
@@ -68,14 +68,15 @@ function setupGame () {
 // TODO: add player input validation, and align other error messages + update JSDoc
 /**
  * Helper function for setting values. Validates the data using RegEx and game board limitations. 
- * @param {String} type Setting type which is requested 
- * @param {Strig} question, which is asked from the user in command prompt. Default value: @STR_INCORRECT  
+ * @param {String} A question, which is asked from the user in command prompt.  
+ * @param {String} Optional minimum value, for additional validation after RegEx (reg argument) check.
+ * @param {Array} Optional array of maximum values, for additional validation after RegEx (reg argument) check.
  * @param {String} errormsg1, error message which is shown for the user if input is incorrect format. Default value: @STR_INCORRECT 
- * @param {String} errormsg2, error message which is shown for the user if ijnput value is too small. Default value: @STR_INCORRECT
- * @param {*} errormsg3, error message which is shown for the user if ijnput value is too big. Default value: @STR_INCORRECT
- * @param {*} reg, RegEx string for validating user input
+ * @param {String} errormsg2, error message which is shown for the user if input value is too small (min atribute needed). Default value: @STR_INCORRECT
+ * @param {String} errormsg3, error message which is shown for the user if input value is too big (max atribute(s) needed). Default value: @STR_INCORRECT 
+ * @param {String} reg, RegEx string for validating user input
  * 
- * @return user input as string
+ * @return User input as String
  */
 function askSettings (question, min, max, errormsg1, errormsg2, errormsg3, reg) {
   let regex = new RegExp(reg)
@@ -83,7 +84,7 @@ function askSettings (question, min, max, errormsg1, errormsg2, errormsg3, reg) 
   let success = false
   let msg1 = errormsg1
   let msg2 = errormsg2
-  let msg3 = STR_INCORRECT
+  let msg3 = errormsg3
 
   if (msg1.length === 0) {
     msg1 = STR_INCORRECT
@@ -109,7 +110,7 @@ function askSettings (question, min, max, errormsg1, errormsg2, errormsg3, reg) 
       } else {
         for (let item in max) {
           if (parseInt(value) > parseInt(max[item])) {
-            console.log('Value cannot be bigger than amount of columns or rows')
+            console.log(msg3)
             success = false
             break
           }
@@ -143,10 +144,10 @@ function askPosition () {
         console.log('Value must be 0 or bigger')
         success = !success
       } else if (col > cols - 1) {
-        console.log('Column value cannot be bigger than ' + (cols - 1) )
+        console.log('Column value cannot be bigger than ' + (cols - 1))
         success = !success
       } else if (row > rows - 1) {
-        console.log('Row value cannot be bigger than ' + (rows -1) )
+        console.log('Row value cannot be bigger than ' + (rows - 1))
         success = !success
       } else if (!isFreePosition(gameBoard, [col, row])) {
         console.log('Position already played')
@@ -269,7 +270,6 @@ function printBoard () {
  * Main Game play function.  
  */
 function playGame () {
- 
   let gameOver = false
   let timerStarted = false
   let isDraw = false
@@ -333,7 +333,7 @@ function playGame () {
 }
 
 /**
- * Makes random selection for the next move
+ * Makes selectin for the computer based on the computerAI level
  */
 function makeSelection () {
   if (computerAI === INT_EASY) {
@@ -363,10 +363,19 @@ function makeSelection () {
   }
 }
 
+/**
+ * Upadtes nextPosition Array by the values that should be played next
+ * @param {String} posR is row in the game board 
+ * @param {String} posC is column in the gameboard  
+ */
 function playNext (posR, posC) {
   nextPosition[0] = posC
   nextPosition[1] = posR
 }
+
+/**
+ * Randomizes next position in the game board 
+ */
 function randomNextPosition () {
   let success = false
   do {
@@ -376,6 +385,10 @@ function randomNextPosition () {
   } while (!success)
 }
 
+/**
+ * Helper function for the computer turn to find next position to play
+ * @param {Number} neededLength is minimum length of player's marks adjacent in the gameboard  
+ */
 function playBasedOnPlayer (neededLength) {
   let startX = 0
   let startY = 0
@@ -402,9 +415,17 @@ function playBasedOnPlayer (neededLength) {
     }
   }
 
-  return [false, -1, -1, ''] 
+  return [false, -1, -1, '']
 }
 
+/**
+ * Helper function to check is it possible to play mark to a place which is before the @pos
+ * @param {Array} pos, the position from where to check
+ *
+ * @return array including information where to play before the @pos location. 
+ * Format is: [(boolean)true/false, (String) row position, (String) column position, (String) direction to play] , e.g. [true, '2', '3', 'b']
+ * if not possible to play, returns array [false, -1, -1, '']
+ */
 function isBeginningfree (pos) {
   let positionToCheck = [0, 0]
   let retPos = pos
@@ -444,6 +465,14 @@ function isBeginningfree (pos) {
   return [false, -1, -1, '']
 }
 
+/**
+* Helper function to check is it possible to play mark to a place which is at the end of the played marks adjacent.
+* @param {Array} pos, the position from where to check
+* @param {Number} lineL, the length of the line which is searched for 
+* @return array including information where to play. 
+* Format is: [(boolean)true/false, (String) row position, (String) column position, (String) direction to play: r/b/dl/dr] , e.g. [true, '2', '3', 'b']
+* if not possible to play, returns array [false, -1, -1, '']
+*/
 function isEndFree (pos, lineL) {
   let positionToCheck = [0, 0]
   let retPos = pos
@@ -529,8 +558,20 @@ function updateBoard () {
 }
 
 /**
- * Checks if the player in turn has won the game. Finds the needed line lentgh horizontally, vertically and diagonically.
- * @return true if the needed line lentgh found, otherwise returns false.
+ * searches lineLen length of adjacent marks in line in the game board. Finds the needed line lentgh horizontally, vertically and diagonically.
+ * @param {Number} lineLen, the lenght of the adjacent marks to find
+ * @param {Number} game board column from where to start searching
+ * @param {Number} game board row from where to start searching
+ * @param {String} playMark, a string which is searched 
+ * 
+ * @return an array of information of all found lines
+ * Format of one item in the return array is: 
+ * [(boolean)true/false, (String) row position, (String) column position, (String) direction to play: r/b/dl/dr] , e.g. [true, '2', '3', 'b']
+ * r = to right diredction
+ * b = to bottom direction
+ * dl = diagonal left bottom direction
+ * dr = diagonal right bottom direction
+ * If no lines found, returns array including item [false, -1, -1, '']
  */
 function checkLineLenght (lineLen, startJ, startI, playMark) {
   let foundLength = 0
