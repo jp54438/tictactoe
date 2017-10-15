@@ -435,7 +435,6 @@ function playBasedOnPlayer (neededLength) {
       if (beginning[0]) {
         return beginning
       }
-      console.log('almost win isEnd ' + positions[pos])
       let end = isEndFree(positions[pos], neededLength)
       if (end[0]) {
         return end
