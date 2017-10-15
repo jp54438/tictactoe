@@ -1,0 +1,30 @@
+{
+  "name": "tictactoe",
+  "version": "1.0.0",
+  "description": "This Tic Tack Toe game is a programming exercise in Front End master course in TAMK. \r It is created using JavaScript (Node.js)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jp54438/tictactoe.git"
+  },
+  "author": "JPP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jp54438/tictactoe/issues"
+  },
+  "homepage": "https://github.com/jp54438/tictactoe#readme",
+  "devDependencies": {
+    "eslint": "^4.8.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.2.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
+  },
+  "dependencies": {
+    "readline-sync": "^1.4.7"
+  }
+}
