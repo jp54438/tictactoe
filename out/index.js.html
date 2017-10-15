@@ -1,4 +1,32 @@
-// index.js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: index.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: index.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// index.js
 var readlineSync = require('readline-sync')
 var rows = 3
 var cols = 3
@@ -126,7 +154,7 @@ function askSettings (question, min, max, errormsg1, errormsg2, errormsg3, reg) 
       console.log(msg1)
     } else {
       // Checking that value is not smaller than min
-      if (parseInt(value) < parseInt(min)) {
+      if (parseInt(value) &lt; parseInt(min)) {
         console.log(msg2)
         success = false
       } else {
@@ -162,7 +190,7 @@ function askPosition () {
     } else {
       col = value.split(' ')[0]
       row = value.split(' ')[1]
-      if (col < 0 || row < 0) {
+      if (col &lt; 0 || row &lt; 0) {
         console.log('Value must be 0 or bigger')
         success = !success
       } else if (col > cols - 1) {
@@ -211,9 +239,9 @@ function ask (question, errormsg, reg) {
  */
 function setupBoard () {
   gameBoard.length = 0
-  for (let i = 0; i < rows; i++) {
+  for (let i = 0; i &lt; rows; i++) {
     let data = []
-    for (let j = 0; j < cols; j++) {
+    for (let j = 0; j &lt; cols; j++) {
       data.push(STR_EMPTY)
     }
     gameBoard.push(data)
@@ -225,8 +253,8 @@ function setupBoard () {
  */
 function printRowLine () {
   let line = '  '
-  for (let c = 0; c < cols; c++) {
-    if (rows <= 10) {
+  for (let c = 0; c &lt; cols; c++) {
+    if (rows &lt;= 10) {
       line += '--- '
     } else {
       if (c === 0) {
@@ -245,14 +273,14 @@ function printRowLine () {
  */
 function printColHeads () {
   let heads = ''
-  if (cols <= 10) {
+  if (cols &lt;= 10) {
     heads = '  '
   } else {
     heads = '   '
   }
 
-  for (let c = 0; c < cols; c++) {
-    if (c <= 10) {
+  for (let c = 0; c &lt; cols; c++) {
+    if (c &lt;= 10) {
       heads += ' ' + c + '  '
     } else {
       heads += ' ' + c + ' '
@@ -268,13 +296,13 @@ function printBoard () {
   printColHeads()
   printRowLine()
   let output = ''
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
+  for (let i = 0; i &lt; rows; i++) {
+    for (let j = 0; j &lt; cols; j++) {
       if (j === 0) {
-        if (rows <= 10) {
+        if (rows &lt;= 10) {
           output = i + '|'
         } else {
-          if (i < 10) {
+          if (i &lt; 10) {
             output = i + ' |'
           } else {
             output = i + '|'
@@ -305,11 +333,11 @@ function playGame () {
 
   while (!gameOver) {
     // start timer if 1-player game
-    if (nbrPlayers === 1 && !timerStarted) {
+    if (nbrPlayers === 1 &amp;&amp; !timerStarted) {
       startTime = new Date().getTime()
       timerStarted = true
     }
-    if (computer && players[turn] === STR_COMPUTER) {
+    if (computer &amp;&amp; players[turn] === STR_COMPUTER) {
       makeSelection()
     } else {
       askPosition()
@@ -342,7 +370,7 @@ function playGame () {
     let elapsed = Math.floor((new Date().getTime() - startTime) / 1000)
     let seconds = elapsed % 60
     console.log('Time: ' + Math.floor(elapsed / 60) + ' minutes ' + seconds + ' seconds')
-    if (computer && players[turn] !== STR_COMPUTER) {
+    if (computer &amp;&amp; players[turn] !== STR_COMPUTER) {
       let isNewHighScore = addHighScore(elapsed, rows + 'x' + cols, players[turn])
 
       if (isNewHighScore) {
@@ -368,7 +396,7 @@ function makeSelection () {
     randomNextPosition()
   } else if (computerAI === INT_MEDIUM) {
     let nextPos = [false]
-    for (let findLength = lineLength - 1; findLength > 1 && nextPos[0] === false; findLength--) {
+    for (let findLength = lineLength - 1; findLength > 1 &amp;&amp; nextPos[0] === false; findLength--) {
       nextPos = playBasedOnPlayer(findLength)
     }
     if (nextPos[0] === true) {
@@ -378,7 +406,7 @@ function makeSelection () {
     }
   } else if (computerAI === INT_HARD) { // INT_HARD
     let nextPos = [false]
-    for (let findLength = lineLength - 1; findLength > 0 && nextPos[0] === false; findLength--) {
+    for (let findLength = lineLength - 1; findLength > 0 &amp;&amp; nextPos[0] === false; findLength--) {
       nextPos = playBasedOnPlayer(findLength)
     }
     if (nextPos[0] === true) {
@@ -550,7 +578,7 @@ function isEndFree (pos, lineL) {
  * @param {Array} position, Array containing x and y coordinates of the position from where the to check whether it is free or not. 
  */
 function isFreePosition (board, position) {
-  if (position[0] < 0 || position[1] < 0 || position[0] > cols - 1 || position[1] > rows - 1) {
+  if (position[0] &lt; 0 || position[1] &lt; 0 || position[0] > cols - 1 || position[1] > rows - 1) {
     return false
   }
 
@@ -565,8 +593,8 @@ function isFreePosition (board, position) {
  * Checks if there are free cells in the gameboard. Returns true if there is at least one free cell.
  */
 function freeCellsInBoard () {
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
+  for (let i = 0; i &lt; rows; i++) {
+    for (let j = 0; j &lt; cols; j++) {
       if (gameBoard[i][j] === STR_EMPTY) {
         return true
       }
@@ -602,15 +630,15 @@ function checkLineLenght (lineLen, startJ, startI, playMark) {
   let returnArray = []
   // check only the player who set the last item
   // try to find items on the right side, then below and last diagonally
-  for (let i = startI; i < rows; i++) {
-    for (let j = startJ; j < cols; j++) {
+  for (let i = startI; i &lt; rows; i++) {
+    for (let j = startJ; j &lt; cols; j++) {
       if (gameBoard[i][j] === playMark) {
         foundLength = 1
         if (lineLen === 1) {
           returnArray.push([true, i, j, 'r'])
         } else {
           // finding items on the right
-          for (let r = j + 1; r < cols; r++) {
+          for (let r = j + 1; r &lt; cols; r++) {
             if (gameBoard[i][r] === playMark) {
               foundLength++
               if (foundLength >= lineLen) {
@@ -622,7 +650,7 @@ function checkLineLenght (lineLen, startJ, startI, playMark) {
           }
           foundLength = 1
           // finding items below
-          for (let b = i + 1; b < rows; b++) {
+          for (let b = i + 1; b &lt; rows; b++) {
             if (gameBoard[b][j] === playMark) {
               foundLength++
               if (foundLength >= lineLen) {
@@ -635,7 +663,7 @@ function checkLineLenght (lineLen, startJ, startI, playMark) {
           foundLength = 1
           // finding item diagonally left below
           let dly = j - 1
-          for (let dlx = i + 1; dlx < rows && dly >= 0; dlx++) {
+          for (let dlx = i + 1; dlx &lt; rows &amp;&amp; dly >= 0; dlx++) {
             if (gameBoard[dlx][dly] === playMark) {
               foundLength++
               if (foundLength >= lineLen) {
@@ -650,7 +678,7 @@ function checkLineLenght (lineLen, startJ, startI, playMark) {
           foundLength = 1
           // finding item diagonally right below
           let dry = j + 1
-          for (let drx = i + 1; drx < rows && dry < cols; drx++) {
+          for (let drx = i + 1; drx &lt; rows &amp;&amp; dry &lt; cols; drx++) {
             if (gameBoard[drx][dry] === playMark) {
               foundLength++
               if (foundLength >= lineLen) {
@@ -677,3 +705,26 @@ function checkLineLenght (lineLen, startJ, startI, playMark) {
  * Starts the game by calling Main function
  */
 main()
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addHighScore">addHighScore</a></li><li><a href="global.html#ask">ask</a></li><li><a href="global.html#askPosition">askPosition</a></li><li><a href="global.html#askSettings">askSettings</a></li><li><a href="global.html#checkLineLenght">checkLineLenght</a></li><li><a href="global.html#freeCellsInBoard">freeCellsInBoard</a></li><li><a href="global.html#isBeginningfree">isBeginningfree</a></li><li><a href="global.html#isEndFree">isEndFree</a></li><li><a href="global.html#isFreePosition">isFreePosition</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#mainMenu">mainMenu</a></li><li><a href="global.html#makeSelection">makeSelection</a></li><li><a href="global.html#playBasedOnPlayer">playBasedOnPlayer</a></li><li><a href="global.html#playGame">playGame</a></li><li><a href="global.html#playNext">playNext</a></li><li><a href="global.html#printBoard">printBoard</a></li><li><a href="global.html#printColHeads">printColHeads</a></li><li><a href="global.html#printRowLine">printRowLine</a></li><li><a href="global.html#randomNextPosition">randomNextPosition</a></li><li><a href="global.html#setupBoard">setupBoard</a></li><li><a href="global.html#setupGame">setupGame</a></li><li><a href="global.html#showHighScore">showHighScore</a></li><li><a href="global.html#updateBoard">updateBoard</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Oct 15 2017 19:59:16 GMT+0300 (Suomen kesäaika)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
